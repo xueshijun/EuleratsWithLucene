@@ -10,9 +10,9 @@ public class Demo {
 	 
 	public static void main(String[] args) throws IOException, SQLException, ParseException {
 		
-//		Index.create(); 
+		Index.create(); 
 //		Index.search("水");
-		Index.search("水       资生堂".split("[ |,|+|，]+"));
+//		Index.search("水       资生堂".split("[ |,|+|，]+"));
 		
 		
  

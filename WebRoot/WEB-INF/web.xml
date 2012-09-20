@@ -23,7 +23,17 @@
 		<url-pattern>/list</url-pattern>
 	</servlet-mapping>
 
+	<error-page>
+		<error-code>500</error-code>
+		<location>/search.html</location>
+	</error-page>
 	
+	<error-page>
+		<exception-type>java.lang.NullPointerException</exception-type>
+		<location>/search.html</location>
+	</error-page>
+
+
   <welcome-file-list>
     <welcome-file>index.jsp</welcome-file>
   </welcome-file-list>

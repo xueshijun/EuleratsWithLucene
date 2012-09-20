@@ -34,11 +34,11 @@ public class ListItem extends HttpServlet {
 		System.out.println("Get reqyest from Search page........");
 		
 		String searchStr=request.getParameter("keyvalue");
-		
-//		System.out.println("The Key is Empty.Redirecting ......."+searchStr);
-//		if(searchStr.trim().equals("")){
-//			response.sendRedirect("search.html");
-//		}
+	 
+		System.out.println("The Key is Empty.Redirecting ......."+searchStr);
+		if(searchStr.trim().equals("")){
+			response.sendRedirect("search.html");
+		}
 		
 		MySql mysql=new MySql();
 
@@ -65,8 +65,7 @@ public class ListItem extends HttpServlet {
 				}; 
 		
 		List<Items> lists=new ArrayList<Items>();
-		
-//		String [] value=new String [conn.length]; 
+		 
 		String market=null; 
 		String sql="";  
 		System.out.println("Get Responsed Items ID Lists For Each Sql Related DB.....");
@@ -103,7 +102,7 @@ public class ListItem extends HttpServlet {
 	
 		
 		for(int i=0;i<conn.length;i++){
-			System.out.println("Get SQL MATCHES DB.....");
+			System.out.println("Get SQL MATCHING DB.....");
 			switch(i){
 				case 0:
 					market=Items.YIHAODIAN_STRING; 
@@ -163,7 +162,7 @@ public class ListItem extends HttpServlet {
 				}
 			} 
 		
-			System.out.println("Sort by Market and price");
+			System.out.println("Sort by Market and price..........");
 			Collections.sort(lists,new Comparator(){ 
 				public int compare(Object o1, Object o2) { 
 					return (int) (((Items)o1).getPrice()- ((Items)o2).getPrice()); 
@@ -171,71 +170,88 @@ public class ListItem extends HttpServlet {
 			}); 
 		 
 			PrintWriter pw=response.getWriter(); 
-			
-			pw.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">");
-			pw.println("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
-			pw.println("<head>");
-			pw.println("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\" />");
-			pw.println("<title>Result page</title>");
-			pw.println("<link rel=\"stylesheet\" href=\"resources/css/reset.css\" type=\"text/css\" media=\"screen\" />");
-			pw.println("<link rel=\"stylesheet\" href=\"resources/css/style.css\" type=\"text/css\" media=\"screen\" />");
-			pw.println("<link rel=\"stylesheet\" href=\"resources/css/invalid.css\" type=\"text/css\" media=\"screen\" />");
-			pw.println("<script type=\"text/javascript\" src=\"resources/scripts/jquery-1.3.2.min.js\"></script>");
-			pw.println("<script type=\"text/javascript\" src=\"resources/scripts/simpla.jquery.configuration.js\"></script>");
-			pw.println("<script type=\"text/javascript\" src=\"resources/scripts/facebox.js\"></script>"); 
-			pw.println("<script type=\"text/javascript\" src=\"resources/scripts/jquery.wysiwyg.js\"></script>"); 
-			pw.println("<script type=\"text/javascript\" src=\"resources/scripts/jquery.datePicker.js\"></script>"); 
-			pw.println("<script type=\"text/javascript\" src=\"resources/scripts/jquery.date.js\"></script>"); 
-			pw.println("</head>"); 
-			pw.println("<body>"); 
-			pw.println("<div id=\"body-wrapper\">"); 
-			pw.println("<div id=\"main-content\">");
-//		    <!-- Main Content Section with everything -->
-//		    <noscript>
-//		    <!-- Show a notification if the user has disabled javascript -->
-//		    <div class="notification error png_bg">
-//		      <div> Javascript is disabled or is not supported by your browser. Please 
-//			  <a href="http://browsehappy.com/" title="Upgrade to a better browser">
-//			  upgrade</a> your browser or 
-//			  <a href="http://www.google.com/support/bin/answer.py?answer=23852" title="Enable Javascript in your browser">
-//			  enable</a> Javascript to navigate the interface properly.
-//		        Download From <a href="http://www.exet.tk">exet.tk</a></div>
-//		    </div>
-//		    </noscript>
-			pw.println("<h2>Welcome!</h2>");  
-			pw.println("<p id=\"page-intro\"> </p>");  
-			pw.println("<div class=\"clear\"></div>");  
-			pw.println("<div class=\"content-box\">");  
-			pw.println(" <div class=\"content-box-header\">");
-			
-			pw.println("<center> <h3>About "+listResult.size()+" results</h3> </center>");  
-			
-			pw.println(" <div class=\"clear\"></div>");  
-			pw.println("</div>");  
-			pw.println("<div class=\"content-box-content\">");
-			pw.println("<div class=\"tab-content default-tab\" id=\"tab1\">");    
-			
-			
-			
-			
-			pw.println("<table>" +
-					"<thead>" +
+			System.out.println("Print Html Tags........");
+			showHtml(pw, lists,listResult.size());
+			System.out.println("All things have done........");
+	
+		} 
+		private static void showHtml(PrintWriter pw,List<Items> lists,int count){
+		
+		pw.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">");
+		pw.println("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+		pw.println("<head>");
+		pw.println("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\" />");
+		pw.println("<title>Result page</title>");
+		pw.println("<link rel=\"stylesheet\" href=\"resources/css/reset.css\" type=\"text/css\" media=\"screen\" />");
+		pw.println("<link rel=\"stylesheet\" href=\"resources/css/style.css\" type=\"text/css\" media=\"screen\" />");
+		pw.println("<link rel=\"stylesheet\" href=\"resources/css/invalid.css\" type=\"text/css\" media=\"screen\" />");
+		pw.println("<script type=\"text/javascript\" src=\"resources/scripts/jquery-1.3.2.min.js\"></script>");
+		pw.println("<script type=\"text/javascript\" src=\"resources/scripts/simpla.jquery.configuration.js\"></script>");
+		pw.println("<script type=\"text/javascript\" src=\"resources/scripts/facebox.js\"></script>"); 
+		pw.println("<script type=\"text/javascript\" src=\"resources/scripts/jquery.wysiwyg.js\"></script>"); 
+		pw.println("<script type=\"text/javascript\" src=\"resources/scripts/jquery.datePicker.js\"></script>"); 
+		pw.println("<script type=\"text/javascript\" src=\"resources/scripts/jquery.date.js\"></script>"); 
+		pw.println("</head>"); 
+		pw.println("<body>"); 
+		pw.println("<div id=\"body-wrapper\">"); 
+		pw.println("<div id=\"main-content\">");
+//	    <!-- Main Content Section with everything -->
+//	    <noscript>
+//	    <!-- Show a notification if the user has disabled javascript -->
+//	    <div class="notification error png_bg">
+//	      <div> Javascript is disabled or is not supported by your browser. Please 
+//		  <a href="http://browsehappy.com/" title="Upgrade to a better browser">
+//		  upgrade</a> your browser or 
+//		  <a href="http://www.google.com/support/bin/answer.py?answer=23852" title="Enable Javascript in your browser">
+//		  enable</a> Javascript to navigate the interface properly.
+//	        Download From <a href="http://www.exet.tk">exet.tk</a></div>
+//	    </div>
+//	    </noscript>
+		pw.println("<h2>Welcome!</h2>");  
+		pw.println("<p id=\"page-intro\"> </p>");  
+		pw.println("<div class=\"clear\"></div>");  
+		pw.println("<div class=\"content-box\">");  
+		pw.println(" <div class=\"content-box-header\">");
+		
+//		pw.println("<center> <h3>Find about "+count+" results</h3> </center>");  
+		pw.println("<center>");
+		pw.println("	<div class=\"notification attention png_bg\"> " +
+		"<a href=\"#\" class=\"close\">" +
+		"<img src=\"resources/images/icons/cross_grey_small.png\" title=\"Close this notification\" alt=\"close\" />" +
+		"</a> <div> Find about "+count+" results</div></div>" );
+		pw.println("</center>");
+		
+		pw.println(" <div class=\"clear\"></div>");  
+		pw.println("</div>");  
+		pw.println("<div class=\"content-box-content\">");
+		pw.println("<div class=\"tab-content default-tab\" id=\"tab1\">");    
+		
+
+
+		
+		pw.println("<table>" +
+				"<thead>" +
+				"<tr>" +
+				"<th>品名</th>" +
+				"<th>商家</th>" +
+				"<th>价钱</th>" +
+				"<th>市场价</th> " +
+				"</tr>" +
+				"</thead>"); 
+		
+		if(lists.size()==0){
+			pw.println(
+					"<tbody>" +
 					"<tr>" +
-					"<th>品名</th>" +
-					"<th>商家</th>" +
-					"<th>价钱</th>" +
-					"<th>市场价</th> " +
+						"<td colspan=\"6\">" +
+						"	<div class=\"notification attention png_bg\"> " +
+								"<a href=\"#\" class=\"close\">" +
+								"<img src=\"resources/images/icons/cross_grey_small.png\" title=\"Close this notification\" alt=\"close\" />" +
+								"</a> <div> SORRY!       NOTHING COULD BE FOUND!</div></div>" +
+						"</td>"+
 					"</tr>" +
-					"</thead>"); 
-			
-//            
-//            <tr> 
-//              Lorem ipsum dolor</td>
-//              <td><a href="#" >Sit amet</a></td>
-//              <td>Consectetur adipiscing</td>
-//              <td>Donec tortor diam</td>
-//            </tr> 
-//          
+					"</tbody>");
+		}else{ 
 			for(Items list:lists){ 	
 					pw.println(
 					"<tbody>" +
@@ -247,41 +263,34 @@ public class ListItem extends HttpServlet {
 					"</tr>" +
 					"</tbody>");
 			}
-			
-			
-			pw.println("<tfoot><tr>");
-			pw.println("<td colspan=\"6\">");
-			pw.println("<div class=\"bulk-actions align-left\"></div> "); 			
-				pw.println("<div class=\"pagination\">");
-				pw.println("<a href=\"#\" title=\"First Page\">&laquo; First</a>");
-				pw.println("<a href=\"#\" title=\"Previous Page\">&laquo; Previous</a> "); 
-				pw.println("<a href=\"#\" class=\"number\" title=\"1\">1</a> <a href=\"#\" class=\"number\" title=\"2\">2</a> ");
-				pw.println("<a href=\"#\" class=\"number current\" title=\"3\">3</a> " +
-						"<a href=\"#\" class=\"number\" title=\"4\">4</a>");
-				pw.println("<a href=\"#\" title=\"Next Page\">Next &raquo;</a>" +
-						"<a href=\"#\" title=\"Last Page\">Last &raquo;</a> "); 
-				pw.println("<span></span><span></span><span></span>");
-				pw.println(" </div>");
-			pw.println("  <div class=\"clear\"></div>"); 
-			pw.println(" </td>");
-			pw.println("</tr>  </tfoot> ");
-			pw.println("");   
-//                <!-- End .pagination -->
-//              
-//             
-//              
-	
-			
-			pw.println("</table>"); 
-			pw.println("</div></div></div>"); 
-			pw.println("<div class=\"clear\"></div>");
-			
-			
-			pw.println("<div id=\"footer\"> <small>");
-			pw.println(" &#169; Copyright 2012- ALRS | <a href=\"#\">Top</a> </small> </div>");
-			pw.println("</div></div></body></html>");
-
-			pw.close(); 
 		} 
+		
+		pw.println("<tfoot><tr>");
+		pw.println("<td colspan=\"6\">");
+		pw.println("<div class=\"bulk-actions align-left\"></div> "); 			
+			pw.println("<div class=\"pagination\">");
+			pw.println("<a href=\"#\" title=\"First Page\">&laquo; First</a>");
+			pw.println("<a href=\"#\" title=\"Previous Page\">&laquo; Previous</a> "); 
+			pw.println("<a href=\"#\" class=\"number\" title=\"1\">1</a> <a href=\"#\" class=\"number\" title=\"2\">2</a> ");
+			pw.println("<a href=\"#\" class=\"number current\" title=\"3\">3</a> " +
+					"<a href=\"#\" class=\"number\" title=\"4\">4</a>");
+			pw.println("<a href=\"#\" title=\"Next Page\">Next &raquo;</a>" +
+					"<a href=\"#\" title=\"Last Page\">Last &raquo;</a> "); 
+			pw.println("<span></span><span></span><span></span>");
+			pw.println(" </div>");
+		pw.println("  <div class=\"clear\"></div>"); 
+		pw.println(" </td>");
+		pw.println("</tr>  </tfoot> ");  
+		pw.println("</table>"); 
+		pw.println("</div></div></div>"); 
+		pw.println("<div class=\"clear\"></div>");
+		
+		
+		pw.println("<div id=\"footer\"> <small>");
+		pw.println(" &#169; Copyright 2012- ALRS | <a href=\"#\">Top</a> </small> </div>");
+		pw.println("</div></div></body></html>");
+
+		pw.close(); 
+	}
 }		
  

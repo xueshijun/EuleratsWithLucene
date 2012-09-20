@@ -47,6 +47,7 @@ public class Index {
 		return doc;
 	} 
 
+	
 	public static void create() throws IOException, SQLException{ 
 		System.out.println("begin to create index............");
 		long start=System.currentTimeMillis(); 
