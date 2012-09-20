@@ -1,0 +1,22 @@
+#
+# The steps to generate item entries
+#
+
+GrabDirhtmlst:
+for generating html links to dirs of items
+
+GrabItemurlst:
+for generating html links to individual items
+
+GrabItemurlst-10:
+this is the version of GrabItemurlst where page depth is set to 10
+
+GrabIteminfolst:
+It uses GrabItemurlst to generate info entries for items
+
+JDpimg2num: turning a given JD-price image into a number
+
+JDpricefill: 
+it fills in the JDprice slots for GrabIteminfolst
+
+###### end of [README] ######
