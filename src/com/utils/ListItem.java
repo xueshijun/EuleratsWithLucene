@@ -23,8 +23,7 @@ public class ListItem extends HttpServlet {
 
 	/* (non-Javadoc)
 	 * @see javax.servlet.http.HttpServlet#service(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
-	 */
-	@SuppressWarnings("unchecked")
+	 */ 
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -40,7 +39,7 @@ public class ListItem extends HttpServlet {
 			response.sendRedirect("search.html");
 		}
 		
-		MySql mysql=new MySql();
+		ItemsJdbcConnection mysql=new ItemsJdbcConnection();
 
 		List<Items> listResult = null;
 		System.out.println("Trying to get index number from physical disk.... ");
@@ -59,9 +58,9 @@ public class ListItem extends HttpServlet {
 		
 		System.out.println("Trying to building connection.... ");   
 		Connection [] conn=new Connection[]{
-				mysql.getConnetction("yihaodian"),
-				mysql.getConnetction("jingdong"),
-				mysql.getConnetction("amazon")
+				ItemsJdbcConnection.getConnetction(ConfigUtil.getValue("YIHAODIAN")),
+				ItemsJdbcConnection.getConnetction(ConfigUtil.getValue("JINGDONG")),
+				ItemsJdbcConnection.getConnetction("AMAZON")
 				}; 
 		
 		List<Items> lists=new ArrayList<Items>();
@@ -165,7 +164,8 @@ public class ListItem extends HttpServlet {
 			System.out.println("Sort by Market and price..........");
 			Collections.sort(lists,new Comparator(){ 
 				public int compare(Object o1, Object o2) { 
-					return (int) (((Items)o1).getPrice()- ((Items)o2).getPrice()); 
+//					return (int) (((Items)o1).getPrice()- ((Items)o2).getPrice());
+					return (int) (((Items)o1).getPrice()*100/((Items)o1).getMarketPrice()- ((Items)o2).getPrice()*100/((Items)o2).getMarketPrice()); 
 				} 
 			}); 
 		 
@@ -175,7 +175,9 @@ public class ListItem extends HttpServlet {
 			System.out.println("All things have done........");
 	
 		} 
-		private static void showHtml(PrintWriter pw,List<Items> lists,int count){
+
+	//
+	private static void showHtml(PrintWriter pw,List<Items> lists,int count){
 		
 		pw.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">");
 		pw.println("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
@@ -236,6 +238,7 @@ public class ListItem extends HttpServlet {
 				"<th>商家</th>" +
 				"<th>价钱</th>" +
 				"<th>市场价</th> " +
+				"<th>折扣</th> " +
 				"</tr>" +
 				"</thead>"); 
 		
@@ -243,7 +246,7 @@ public class ListItem extends HttpServlet {
 			pw.println(
 					"<tbody>" +
 					"<tr>" +
-						"<td colspan=\"6\">" +
+						"<td colspan=\"7\">" +
 						"	<div class=\"notification attention png_bg\"> " +
 								"<a href=\"#\" class=\"close\">" +
 								"<img src=\"resources/images/icons/cross_grey_small.png\" title=\"Close this notification\" alt=\"close\" />" +
@@ -259,14 +262,15 @@ public class ListItem extends HttpServlet {
 						"<td><a title=\"title\" href='"+list.getUrl()+"'>"+list.getTitle()+"-"+list.getId()+"</a></td>" +
 						"<td>"+list.getMarket()+"</td>" +
 						"<td>"+list.getPrice()+"</td>" +
-						"<td>"+list.getMarketPrice()+"</td>" + 
+						"<td>"+list.getMarketPrice()+"</td>" +
+						"<td>"+(int)(list.getPrice()*100/list.getMarketPrice()*100)/100+"折</td>" +
 					"</tr>" +
 					"</tbody>");
 			}
 		} 
 		
 		pw.println("<tfoot><tr>");
-		pw.println("<td colspan=\"6\">");
+		pw.println("<td colspan=\"7\">");
 		pw.println("<div class=\"bulk-actions align-left\"></div> "); 			
 			pw.println("<div class=\"pagination\">");
 			pw.println("<a href=\"#\" title=\"First Page\">&laquo; First</a>");
@@ -292,5 +296,19 @@ public class ListItem extends HttpServlet {
 
 		pw.close(); 
 	}
+		
+	public final static int INITIONAL=0;//初始化
+	public final static int VIEWDEFAULTPAGE=1;//
+	public final static int VIEWSPECIALPAGE=2;//
+//	public final static int PAGE=2;//
+	
+	public void model(int type){
+		switch(type){
+			case VIEWDEFAULTPAGE:
+			break;
+			case VIEWSPECIALPAGE: 
+			break;
+		}
+	}	
 }		
  

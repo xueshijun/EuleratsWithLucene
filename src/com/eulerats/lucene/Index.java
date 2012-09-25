@@ -27,8 +27,9 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
+import com.utils.ConfigUtil;
 import com.utils.Items;
-import com.utils.MySql;
+import com.utils.ItemsJdbcConnection;
 
 public class Index {
 	public Index(){}
@@ -59,12 +60,12 @@ public class Index {
 				true,IndexWriter.MaxFieldLength.UNLIMITED);
 	
 		String sql="select * from Items"; 
-		MySql mysql=new MySql();
+		ItemsJdbcConnection mysql=new ItemsJdbcConnection();
 		
 		Connection [] conn=new Connection[]{
-				mysql.getConnetction("yihaodian"),
-				mysql.getConnetction("jingdong"),
-				mysql.getConnetction("amazon")
+				ItemsJdbcConnection.getConnetction(ConfigUtil.getValue("YIHAODIAN")),
+				ItemsJdbcConnection.getConnetction(ConfigUtil.getValue("JINGDONG")),
+				ItemsJdbcConnection.getConnetction("AMAZON")
 				}; 
 		
 		try {  
@@ -85,9 +86,7 @@ public class Index {
 				ResultSet rs=mysql.getResultSet(conn[i], sql);  
 				while(rs.next()){ 
 					writer.addDocument(
-							getDocument(market,
-										rs.getString("Id"),
-										rs.getString("Title")));   
+							getDocument(market, rs.getString("Id"),market+" "+rs.getString("Title")));   
 					System.out.println(market+"  "+rs.getString("Id")+"  "+rs.getString("Title"));
 				} 
 				rs.close();
@@ -127,7 +126,7 @@ public class Index {
 		TermQuery termQuery1=new TermQuery(new Term("Market",str)); 
 		TermQuery termQuery2=new TermQuery(new Term("Title",str)); 
 		query.add(termQuery1,BooleanClause.Occur.SHOULD);
-		query.add(termQuery2,BooleanClause.Occur.SHOULD);	
+		query.add(termQuery2,BooleanClause.Occur.SHOULD);
 	
 		
 		
@@ -174,17 +173,24 @@ public class Index {
 	//	QueryParser parser=new QueryParser(Version.LUCENE_30,
 	//			key,//ItemNumber,ItemName,ItemType,MarketPrice
 	//			new StandardAnalyzer(Version.LUCENE_30));
-	//	Query query=parser.parse(value);/**ParseException*/ 
+	//	Query query=parser.parse(value);/**ParseException*/
+		
+		 
+		 
 		
 		BooleanQuery query=new BooleanQuery(); 
 		TermQuery termQuery;
 		for(int i=0;i<str.length;i++){ 
 			termQuery=new TermQuery(new Term("Title",str[i]));  
-			query.add(termQuery,BooleanClause.Occur.MUST); 
+			query.add(termQuery,BooleanClause.Occur.MUST);
 			
-			termQuery=new TermQuery(new Term("Market",str[i]));  
-			query.add(termQuery,BooleanClause.Occur.SHOULD);
+			termQuery=new TermQuery(new Term("Market",str[i])); 
+			if(str[i].equals("京东")||str[i].equals("一号店")||str[i].equals("亚马逊")){   
+				query.add(termQuery,BooleanClause.Occur.MUST);	
+			} 
+			query.add(termQuery,BooleanClause.Occur.SHOULD); 
 		}
+		
 	
 		
 		

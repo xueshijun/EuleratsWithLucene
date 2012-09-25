@@ -27,7 +27,7 @@ public class AddItems extends HttpServlet {
 			 
 			response.setContentType("text/html;charset=utf-8");
 			
-			MySql mysql=new MySql();
+			ItemsJdbcConnection mysql=new ItemsJdbcConnection();
 			Connection conn=null; 
 			
 			String sql="insert into Items(Url,Title,MarketPrice,Price)" +

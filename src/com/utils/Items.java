@@ -1,7 +1,6 @@
 package com.utils;
 
-public 
-class Items{
+public class Items{
 	public  static final int YIHAODIAN_INT=1;
 	public  static final int JINGDONG_INT=2;
 	public  static final int AMAZON_INT=3; 
@@ -111,4 +110,15 @@ class Items{
 	public void setId(int id) {
 		this.id = id;
 	} 
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Items){ 
+			return this.id==((Items)obj).id;
+		}
+		return false; 
+	} 
+	@Override
+	public int hashCode() { 
+		return this.id;
+	}  
 } 
