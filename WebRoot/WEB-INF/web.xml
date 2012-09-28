@@ -6,7 +6,7 @@
 	http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 	<servlet>
 		<servlet-name>searchItems</servlet-name>
-		<servlet-class>com.utils.Search</servlet-class>
+		<servlet-class>com.action.Search</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>searchItems</servlet-name>
@@ -16,7 +16,7 @@
 	 
 	<servlet>
 		<servlet-name>addItems</servlet-name>
-		<servlet-class>com.utils.AddItems</servlet-class>
+		<servlet-class>com.action.AddItems</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>addItems</servlet-name>
@@ -25,7 +25,7 @@
 
 	<servlet>
 		<servlet-name>listItems</servlet-name>
-		<servlet-class>com.utils.ListItem</servlet-class>
+		<servlet-class>com.action.ListItem</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>listItems</servlet-name>

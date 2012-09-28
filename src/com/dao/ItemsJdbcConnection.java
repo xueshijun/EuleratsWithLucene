@@ -1,4 +1,4 @@
-package com.utils;
+package com.dao;
 
 
 import java.sql.Connection;
@@ -7,6 +7,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import com.utils.ConfigUtil;
 public class ItemsJdbcConnection {
  
 // 
@@ -107,7 +109,7 @@ public class ItemsJdbcConnection {
     /**
      * 返回结果集
      * */ 
-	public ResultSet getResultSet(Connection conn,String sql){ 
+	public static ResultSet getResultSet(Connection conn,String sql){ 
     	Statement statement=null;
     	ResultSet result=null;
     	try

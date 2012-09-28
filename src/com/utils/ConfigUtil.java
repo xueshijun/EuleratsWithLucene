@@ -1,6 +1,7 @@
 package com.utils;
 
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Properties;
 
 public class ConfigUtil { 
@@ -25,6 +26,7 @@ public class ConfigUtil {
 		System.out.println(getValue("JINGDONG"));
 		System.out.println(getValue("YIHAODIAN"));
 		System.out.println(getValue("AMAZON"));
-		System.out.println(getValue("ABC")); 
+		System.out.println(
+				Arrays.toString(getValue("DBNAMES").split(","))); 
 	}
 }

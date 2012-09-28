@@ -1,4 +1,4 @@
-package com.utils;
+package com.entity;
 
 public class Items{
 	public  static final int YIHAODIAN_INT=1;
@@ -7,7 +7,9 @@ public class Items{
 	
 	public  static final String YIHAODIAN_STRING="一号店YIHAODIAN";
 	public  static final String JINGDONG_STRING="京东JINGDONG";
-	public  static final String AMAZON_STRING="亚马逊Amazon"; 
+	public  static final String AMAZON_STRING="亚马逊Amazon";  
+	public  static final String COO8_STRING="酷吧coo8"; 
+		
 	
 	private String market; 
 	private int id;

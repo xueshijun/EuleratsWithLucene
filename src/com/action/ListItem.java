@@ -1,4 +1,4 @@
-package com.utils;
+package com.action;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -8,7 +8,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -17,7 +19,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.lucene.queryParser.ParseException;
 
-import com.eulerats.lucene.Index;
+import com.dao.ItemsJdbcConnection;
+import com.entity.Items;
+import com.lucene.Index;
+import com.utils.ConfigUtil;
 
 public class ListItem extends HttpServlet {
 
@@ -47,7 +52,13 @@ public class ListItem extends HttpServlet {
 		String [] keywords=searchStr.split("[ |,|+|£¬]+");
 		
 		try {
-			listResult= Index.search(keywords);
+			if(keywords.length==0){
+				System.out.println("Single Keyword.... ");
+				listResult= Index.search(searchStr); 
+			}else{
+				System.out.println("Multiple Keywords.... ");
+				listResult= Index.search(keywords);
+			} 
 			
 			for(Items list:listResult){
 				System.out.println(list.getId()+"\t"+list.getMarket());
@@ -56,7 +67,8 @@ public class ListItem extends HttpServlet {
 			e1.printStackTrace();
 		} 
 		
-		System.out.println("Trying to building connection.... ");   
+		System.out.println("Trying to building connection.... ");
+		 
 		Connection [] conn=new Connection[]{
 				ItemsJdbcConnection.getConnetction(ConfigUtil.getValue("YIHAODIAN")),
 				ItemsJdbcConnection.getConnetction(ConfigUtil.getValue("JINGDONG")),
@@ -67,11 +79,13 @@ public class ListItem extends HttpServlet {
 		 
 		String market=null; 
 		String sql="";  
-		System.out.println("Get Responsed Items ID Lists For Each Sql Related DB.....");
+		System.out.println("Get Responsed Items Lists of ID  For Each Sql Related To Each DB.....");
 		
 		String value1="";
 		String value2="";
 		String value3="";
+		
+		
 		
 		for(int j=0;j<listResult.size();j++){
 			if(listResult.get(j).getMarket().equals(Items.YIHAODIAN_STRING)){
@@ -297,18 +311,5 @@ public class ListItem extends HttpServlet {
 		pw.close(); 
 	}
 		
-	public final static int INITIONAL=0;//³õÊ¼»¯
-	public final static int VIEWDEFAULTPAGE=1;//
-	public final static int VIEWSPECIALPAGE=2;//
-//	public final static int PAGE=2;//
-	
-	public void model(int type){
-		switch(type){
-			case VIEWDEFAULTPAGE:
-			break;
-			case VIEWSPECIALPAGE: 
-			break;
-		}
-	}	
 }		
  

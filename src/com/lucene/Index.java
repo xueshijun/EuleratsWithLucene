@@ -1,4 +1,4 @@
-package com.eulerats.lucene;
+package com.lucene;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
@@ -25,16 +26,17 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.Version;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
+import com.dao.ItemsJdbcConnection;
+import com.entity.Items;
 import com.utils.ConfigUtil;
-import com.utils.Items;
-import com.utils.ItemsJdbcConnection;
 
 public class Index {
 	public Index(){}
 	
-	public final static String INDEX_STORE_PATH="C://AllIndex"+File.separator;
+	public final static String INDEX_STORE_PATH="J:/home/xueshijun/File/AllIndex"+File.separator; 
 	
 	private static Document getDocument(String market,String id,String title)
 	throws SQLException{  
@@ -58,18 +60,26 @@ public class Index {
 		IndexWriter writer=new IndexWriter(dir,
 				 new IKAnalyzer(),
 				true,IndexWriter.MaxFieldLength.UNLIMITED);
-	
-		String sql="select * from Items"; 
-		ItemsJdbcConnection mysql=new ItemsJdbcConnection();
+//		IndexWriter writer=new IndexWriter(dir,
+//				new StandardAnalyzer(Version.LUCENE_30),
+//				true,IndexWriter.MaxFieldLength.UNLIMITED);
+			
+		String sql="select * from ITMmain"; 
+		
+//		String[] str_Conn=ConfigUtil.getValue("DBNAMES").split(","); 
+//		
+//		Map<String,Connection>  listConnMap=new HashMap<String,Connection>();
+//		for(int i=0;i<str_Conn.length;i++){
+//			listConnMap.put(str_Conn[i],ItemsJdbcConnection.getConnetction(str_Conn[i]));
+//		}
 		
 		Connection [] conn=new Connection[]{
 				ItemsJdbcConnection.getConnetction(ConfigUtil.getValue("YIHAODIAN")),
 				ItemsJdbcConnection.getConnetction(ConfigUtil.getValue("JINGDONG")),
-				ItemsJdbcConnection.getConnetction("AMAZON")
+				ItemsJdbcConnection.getConnetction(ConfigUtil.getValue("AMAZON"))
 				}; 
 		
-		try {  
-			
+		try {
 			for(int i=0;i<conn.length;i++){	
 				String market = "";
 				switch(i){
@@ -83,11 +93,21 @@ public class Index {
 					market=Items.AMAZON_STRING;
 					break;
 				} 
-				ResultSet rs=mysql.getResultSet(conn[i], sql);  
+				
+				
+//				id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+//				ITMid VARCHAR(16) NOT NULL,
+//				ITMstore int(2) NOT NULL,
+//				ITMtitle VARCHAR(120) CHARACTER SET utf8 NOT NULL,
+//				ITMprice FLOAT(6,2) NOT NULL,
+//				ITMmprice FLOAT(6,2) NOT NULL,
+				
+				
+				ResultSet rs=ItemsJdbcConnection.getResultSet(conn[i], sql);  
 				while(rs.next()){ 
 					writer.addDocument(
-							getDocument(market, rs.getString("Id"),market+" "+rs.getString("Title")));   
-					System.out.println(market+"  "+rs.getString("Id")+"  "+rs.getString("Title"));
+							getDocument(market, rs.getString("id"),market+" "+rs.getString("ITMtitle")));   
+					System.out.println(market+"  "+rs.getString("id")+"  "+rs.getString("ITMtitle"));
 				} 
 				rs.close();
 				conn[i].close(); 
@@ -184,7 +204,8 @@ public class Index {
 			termQuery=new TermQuery(new Term("Title",str[i]));  
 			query.add(termQuery,BooleanClause.Occur.MUST);
 			
-			termQuery=new TermQuery(new Term("Market",str[i])); 
+			termQuery=new TermQuery(new Term("Market",str[i]));
+			
 			if(str[i].equals("京东")||str[i].equals("一号店")||str[i].equals("亚马逊")){   
 				query.add(termQuery,BooleanClause.Occur.MUST);	
 			} 
