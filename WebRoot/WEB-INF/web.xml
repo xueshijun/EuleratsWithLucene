@@ -41,6 +41,11 @@
 		<exception-type>java.lang.NullPointerException</exception-type>
 		<location>/search.html</location>
 	</error-page>
+	
+	<error-page> 
+	    <exception-type>java.lang.Exception</exception-type> 
+	    <location>/error.jsp</location> 
+	</error-page>
 
 
   <welcome-file-list>

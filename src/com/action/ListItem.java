@@ -9,8 +9,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -29,166 +32,203 @@ public class ListItem extends HttpServlet {
 	/* (non-Javadoc)
 	 * @see javax.servlet.http.HttpServlet#service(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */ 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		request.setCharacterEncoding("utf-8");
 		response.setContentType("text/html;charset=utf-8");
 		
-		System.out.println("Get reqyest from Search page........");
+		System.out.println("Get request from Search page........");
 		
 		String searchStr=request.getParameter("keyvalue");
 	 
-		System.out.println("The Key is Empty.Redirecting ......."+searchStr);
+		System.out.println("The Key is Empty! Redirecting ......."+searchStr);
 		if(searchStr.trim().equals("")){
 			response.sendRedirect("search.html");
 		}
 		
-		ItemsJdbcConnection mysql=new ItemsJdbcConnection();
 
-		List<Items> listResult = null;
-		System.out.println("Trying to get index number from physical disk.... ");
 		
-		String [] keywords=searchStr.split("[ |,|+|，]+");
-		
-		try {
-			if(keywords.length==0){
-				System.out.println("Single Keyword.... ");
-				listResult= Index.search(searchStr); 
-			}else{
-				System.out.println("Multiple Keywords.... ");
-				listResult= Index.search(keywords);
+		//-------------------------------------------------------------
+		List<Items> listResult = null; 
+		System.out.println("Get Keywords.... ");
+		String [] keywords=searchStr.split("[ |,|+|，]+"); 
+		System.out.println("Trying to get index  from physical disk.... ");
+		if(keywords.length==0){
+			System.out.println("Single Keyword.... ");
+			try {
+				listResult= Index.search(searchStr);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			} 
-			
-			for(Items list:listResult){
-				System.out.println(list.getId()+"\t"+list.getMarket());
+		}else{
+			System.out.println("Multiple Keywords.... ");
+			try {
+				listResult= Index.search(keywords);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-		} catch (ParseException e1) { 
-			e1.printStackTrace();
-		} 
-		
-		System.out.println("Trying to building connection.... ");
+		}  
+		System.out.println("Listing Items in index...... ");
+		for(Items list:listResult){
+			System.out.println(list.getId()+"\t"+list.getMarketName());
+		}
 		 
-		Connection [] conn=new Connection[]{
-				ItemsJdbcConnection.getConnetction(ConfigUtil.getValue("YIHAODIAN")),
-				ItemsJdbcConnection.getConnetction(ConfigUtil.getValue("JINGDONG")),
-				ItemsJdbcConnection.getConnetction("AMAZON")
-				}; 
+		//------------------------------------------------------------- 
+		System.out.println("Get Responsed Items ID Lists of Each  Related DB.....");  
+		String value1="";//YIHAODIAN
+		String value2="";//JINGDONG
+		String value3="";//AMAZON
+		String value4="";//COO8
+		for(int i=0;i<listResult.size();i++){
+			if(listResult.get(i).getMarketName().equals(Items.YIHAODIAN_STRING)){
+				if(value1.equals("")){
+					value1+=listResult.get(i).getId();		
+				}else{
+					value1+=","+listResult.get(i).getId();
+				} 
+			}else if(listResult.get(i).getMarketName().equals(Items.JINGDONG_STRING)){
+				if(value2.equals("")){
+					value2+=listResult.get(i).getId();		
+				}else{
+					value2+=","+listResult.get(i).getId();
+				} 
+			}else if(listResult.get(i).getMarketName().equals(Items.AMAZON_STRING)){
+				if(value3.equals("")){
+					value3+=listResult.get(i).getId();		
+				}else{
+					value3+=","+listResult.get(i).getId();
+				}  
+			} else if(listResult.get(i).getMarketName().equals(Items.COO8_STRING)){
+				if(value4.equals("")){
+					value4+=listResult.get(i).getId();		
+				}else{
+					value4+=","+listResult.get(i).getId();
+				}  
+			}   
+		}
+		
 		
 		List<Items> lists=new ArrayList<Items>();
-		 
 		String market=null; 
-		String sql="";  
-		System.out.println("Get Responsed Items Lists of ID  For Each Sql Related To Each DB.....");
-		
-		String value1="";
-		String value2="";
-		String value3="";
-		
-		
-		
-		for(int j=0;j<listResult.size();j++){
-			if(listResult.get(j).getMarket().equals(Items.YIHAODIAN_STRING)){
-				if(value1.equals("")){
-					value1+=listResult.get(j).getId();		
-				}else{
-					value1+=","+listResult.get(j).getId();
-				} 
-			}else if(listResult.get(j).getMarket().equals(Items.JINGDONG_STRING)){
-				if(value2.equals("")){
-					value2+=listResult.get(j).getId();		
-				}else{
-					value2+=","+listResult.get(j).getId();
-				} 
-			}else if(listResult.get(j).getMarket().equals(Items.AMAZON_STRING)){
-				if(value3.equals("")){
-					value3+=listResult.get(j).getId();		
-				}else{
-					value3+=","+listResult.get(j).getId();
-				}  
-			} 
-		}  
+		String sql="";   
+		 
 		System.out.println("Output Response ID.....");
 		System.out.println("value1:"+value1);
 		System.out.println("value2:"+value2);
 		System.out.println("value3:"+value3);
+		System.out.println("value4:"+value4);
 	
 		
-		for(int i=0;i<conn.length;i++){
-			System.out.println("Get SQL MATCHING DB.....");
-			switch(i){
-				case 0:
-					market=Items.YIHAODIAN_STRING; 
-					if(!value1.trim().equals("")){ 
-						sql="select * from Items where Id in ("+value1+");";
-					}else{
-						sql="";
-					}
-					break;
-				case 1:
-					market=Items.JINGDONG_STRING; 
-					if(!value2.trim().equals("")){ 
-						sql="select * from Items where Id in ("+value2+");";
-					}else{
-						sql="";
-					}
-					break;
-				case 2:
-					market=Items.AMAZON_STRING;
-					if(!value3.trim().equals("")){ 
-						sql="select * from Items where Id in ("+value3+");";
-					}else{
-						sql="";
-					}
-					break; 	
-			}
+		System.out.println();
+		
+		System.out.println("Trying to building connection.... "); 
+		//		Connection [] conn=new Connection[]{
+		//		ItemsJdbcConnection.getConnetction(ConfigUtil.getValue("YIHAODIAN")),
+		//		ItemsJdbcConnection.getConnetction(ConfigUtil.getValue("JINGDONG")),
+		//		ItemsJdbcConnection.getConnetction("AMAZON")
+		//		}; 
+		//
+		//DBNAMES=JINGDONG,YIHAODIAN,AMAZON,COO8
+		String[] str_Conn=ConfigUtil.getValue("DBNAMES").split(",");  
+		Map<String,Connection>  connMap=new HashMap<String,Connection>();
+		for(int i=0;i<str_Conn.length;i++){
+			connMap.put(str_Conn[i],ItemsJdbcConnection.getConnetction(
+					ConfigUtil.getValue(str_Conn[i])));
+		}  
+		
+		Set<Entry<String, Connection>> entry=connMap.entrySet();
+		Iterator<Entry<String, Connection>> iterator=entry.iterator();
+		System.out.println("Get SQL MATCHING DB.....");
+		
+		
+		
+		while(iterator.hasNext()){
+			Entry<String, Connection> entity=iterator.next(); 
+			System.out.println(entity.getKey()+":"+entity.getValue()); 
+			sql="";
+			if(entity.getKey().equals(Items.YIHAODIAN)){
+				market=Items.YIHAODIAN_STRING; 
+				if(!value1.trim().equals("")){ 
+					sql="select * from ITMmain where Id in ("+value1+");";
+				}else{
+					continue;
+				} 
+			}else if(entity.getKey().equals(Items.JINGDONG)){
+				market=Items.JINGDONG_STRING; 
+				if(!value2.trim().equals("")){ 
+					sql="select * from ITMmain where Id in ("+value2+");";
+				} else{
+					continue;
+				} 
+			} else if(entity.getKey().equals(Items.AMAZON)){ 
+				market=Items.AMAZON_STRING;
+				if(!value3.trim().equals("")){ 
+					sql="select * from ITMmain where Id in ("+value3+");";
+				}else{
+					continue;
+				} 
+			}else if(entity.getKey().equals(Items.COO8)){ 
+				market=Items.COO8_STRING;
+				if(!value4.trim().equals("")){ 
+					sql="select * from ITMmain where Id in ("+value4+");";
+				}else{
+					continue;
+				} 
+			} 
 			
+			System.out.println("SQL:"+sql);
 			System.out.println("Try to get data from db using sql statement........");
-			System.out.println(sql); 
-			if(sql.equals("")){ 
-				System.out.println("**********No data in "+market+" db************");
-				continue; 
-			}  
+//			System.out.println(sql); 
+//			if(sql.equals("")){ 
+//				System.out.println("**********No data in "+market+" db************");
+//				continue; 
+//			}  
 			
 			System.out.println("Try to get ResultSet from db using "+market+"........");
-			ResultSet rs  =mysql.getResultSet(conn[i], sql);
+		 
+			ResultSet rs  =ItemsJdbcConnection.getResultSet(entity.getValue(), sql);
 			try {
 				while(rs.next()){ 
-					lists.add(
-							new Items(
-									Integer.parseInt(rs.getString("Id")),
-									market,
-								    rs.getString("Url"),
-							    	rs.getString("Title"),
-									Double.parseDouble(rs.getString("MarketPrice")),
-									Double.parseDouble(rs.getString("Price")))
-								); 
-							System.out.println(market);
-					} 
-					rs.close();
-					conn[i].close(); 
+					lists.add( 
+//						Items(int id,int itemId,int marketId,String title,double marketPrice,double price){
+						new Items(
+							Integer.parseInt(rs.getString("Id")),  
+							rs.getString("ITMstore"),
+							rs.getString("ITMid"),
+							rs.getString("ITMtitle"),
+							Double.parseDouble(rs.getString("ITMmprice")),
+							Double.parseDouble(rs.getString("ITMprice"))
+							,true)
+					); 
+					System.out.println(market);
+				} 
+				rs.close();
+				entity.getValue().close(); 
 					
-				} catch (NumberFormatException e) { 
-					e.printStackTrace();
-				} catch (SQLException e) { 
-					e.printStackTrace();
-				}
-			} 
-		
-			System.out.println("Sort by Market and price..........");
-			Collections.sort(lists,new Comparator(){ 
-				public int compare(Object o1, Object o2) { 
+			} catch (NumberFormatException e) { 
+				e.printStackTrace();
+			} catch (SQLException e) { 
+				e.printStackTrace();
+			}
+		}  
+		System.out.println("Sort by Market and price..........");
+		Collections.sort(lists,new Comparator(){ 
+			public int compare(Object o1, Object o2) { 
 //					return (int) (((Items)o1).getPrice()- ((Items)o2).getPrice());
 					return (int) (((Items)o1).getPrice()*100/((Items)o1).getMarketPrice()- ((Items)o2).getPrice()*100/((Items)o2).getMarketPrice()); 
-				} 
-			}); 
+			} 
+		}); 
 		 
-			PrintWriter pw=response.getWriter(); 
-			System.out.println("Print Html Tags........");
-			showHtml(pw, lists,listResult.size());
-			System.out.println("All things have done........");
+		PrintWriter pw=response.getWriter(); 
+		System.out.println("Print Html Tags........");
+		showHtml(pw, lists,listResult.size());
+		System.out.println("All things have done........");
 	
-		} 
+	} 
 
 	//
 	private static void showHtml(PrintWriter pw,List<Items> lists,int count){
@@ -250,12 +290,12 @@ public class ListItem extends HttpServlet {
 				"<tr>" +
 				"<th>品名</th>" +
 				"<th>商家</th>" +
-				"<th>价钱</th>" +
+				"<th>价格</th>" +
 				"<th>市场价</th> " +
 				"<th>折扣</th> " +
 				"</tr>" +
 				"</thead>"); 
-		
+		System.out.println("商品总数"+lists.size());
 		if(lists.size()==0){
 			pw.println(
 					"<tbody>" +
@@ -269,12 +309,15 @@ public class ListItem extends HttpServlet {
 					"</tr>" +
 					"</tbody>");
 		}else{ 
+//			Items(int id,int itemId,int marketId,String title,double marketPrice,double price){
 			for(Items list:lists){ 	
+				String url="";
+				String marketName="";
 					pw.println(
 					"<tbody>" +
 					"<tr>" +
-						"<td><a title=\"title\" href='"+list.getUrl()+"'>"+list.getTitle()+"-"+list.getId()+"</a></td>" +
-						"<td>"+list.getMarket()+"</td>" +
+						"<td><a title=\"title\" href='"+list.getItemId()+"'>"+list.getTitle()+"-"+list.getId()+"</a></td>" +
+						"<td>"+list.getMarketName()+"-"+list.getMarketId()+"</td>" +
 						"<td>"+list.getPrice()+"</td>" +
 						"<td>"+list.getMarketPrice()+"</td>" +
 						"<td>"+(int)(list.getPrice()*100/list.getMarketPrice()*100)/100+"折</td>" +
@@ -289,8 +332,8 @@ public class ListItem extends HttpServlet {
 			pw.println("<div class=\"pagination\">");
 			pw.println("<a href=\"#\" title=\"First Page\">&laquo; First</a>");
 			pw.println("<a href=\"#\" title=\"Previous Page\">&laquo; Previous</a> "); 
-			pw.println("<a href=\"#\" class=\"number\" title=\"1\">1</a> <a href=\"#\" class=\"number\" title=\"2\">2</a> ");
-			pw.println("<a href=\"#\" class=\"number current\" title=\"3\">3</a> " +
+			pw.println("<a href=\"#\" class=\"number current\" title=\"1\">1</a> <a href=\"#\" class=\"number\" title=\"2\">2</a> ");
+			pw.println("<a href=\"#\"  class=\"number\" title=\"3\">3</a> " +
 					"<a href=\"#\" class=\"number\" title=\"4\">4</a>");
 			pw.println("<a href=\"#\" title=\"Next Page\">Next &raquo;</a>" +
 					"<a href=\"#\" title=\"Last Page\">Last &raquo;</a> "); 

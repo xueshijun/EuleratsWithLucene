@@ -3,35 +3,57 @@ package com.entity;
 public class Items{
 	public  static final int YIHAODIAN_INT=1;
 	public  static final int JINGDONG_INT=2;
-	public  static final int AMAZON_INT=3; 
+	public  static final int AMAZON_INT=3;
+	public  static final int COO8_INT=3;
+
 	
+	//与配置文件中DBNAMES的对应
+	public  static final String JINGDONG="JINGDONG";
+	public  static final String YIHAODIAN="YIHAODIAN";
+	public  static final String AMAZON="AMAZON";  
+	public  static final String COO8="COO8";
+	
+	//用于索引的分类
 	public  static final String YIHAODIAN_STRING="一号店YIHAODIAN";
 	public  static final String JINGDONG_STRING="京东JINGDONG";
 	public  static final String AMAZON_STRING="亚马逊Amazon";  
 	public  static final String COO8_STRING="酷吧coo8"; 
 		
 	
-	private String market; 
+	private String marketName; 
+	private String marketId;
 	private int id;
+	private String itemId;
+	
 	private String url;
 	private String title;
 	private double marketPrice;
 	private double price;
-	public Items(String market,int id){
-		this.market=market;
+	public Items(String marketName,int id){
+		this.marketName=marketName;
 		this.id=id;
 	}
 	public Items(String market,String url,String title,double marketPrice,double price){
-		this.market=market;
+		this.marketName=marketName;
 		this.url=url;
 		this.title=title;
 		this.marketPrice=marketPrice;
 		this.price=price; 
 	}
-	public Items(int id,String market,String url,String title,double marketPrice,double price){
+	public Items(int id,String marketName,String url,String title,double marketPrice,double price){
 		this.id=id;
-		this.market=market;
+		this.marketName=marketName;
 		this.url=url;
+		this.title=title;
+		this.marketPrice=marketPrice;
+		this.price=price; 
+	}
+	
+	/**ITMmain*/
+	public Items(int id,String marketId,String itemId,String title,double marketPrice,double price,boolean bol){
+		this.id=id;
+		this.itemId=itemId; 
+		this.marketId=marketId;
 		this.title=title;
 		this.marketPrice=marketPrice;
 		this.price=price; 
@@ -76,18 +98,7 @@ public class Items{
 		return "title"+this.title+" url"+this.url+" marketPrice"+this.marketPrice+" price"+this.price;
 			
 	}
-	/**
-	 * @return the market
-	 */
-	public String getMarket() {
-		return market;
-	}
-	/**
-	 * @param market the market to set
-	 */
-	public void setMarket(String market) {
-		this.market = market;
-	}
+ 
 	/**
 	 * @return the url
 	 */
@@ -122,5 +133,43 @@ public class Items{
 	@Override
 	public int hashCode() { 
 		return this.id;
-	}  
+	}
+	 
+	/**
+	 * @return the itemId
+	 */
+	public String getItemId() {
+		return itemId;
+	}
+	/**
+	 * @param itemId the itemId to set
+	 */
+	public void setItemId(String itemId) {
+		this.itemId = itemId;
+	}
+	/**
+	 * @return the marketName
+	 */
+	public String getMarketName() {
+		return marketName;
+	}
+	/**
+	 * @param marketName the marketName to set
+	 */
+	public void setMarketName(String marketName) {
+		this.marketName = marketName;
+	}
+	/**
+	 * @return the marketId
+	 */
+	public String getMarketId() {
+		return marketId;
+	}
+	/**
+	 * @param marketId the marketId to set
+	 */
+	public void setMarketId(String marketId) {
+		this.marketId = marketId;
+	}
+	 
 } 

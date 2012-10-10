@@ -3,8 +3,10 @@ package com.lucene;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -12,6 +14,7 @@ import java.util.Map.Entry;
 import org.apache.lucene.queryParser.ParseException;
 
 import com.dao.ItemsJdbcConnection;
+import com.entity.Items;
 import com.utils.ConfigUtil;
  
 
@@ -20,7 +23,16 @@ public class Demo {
 	public static void main(String[] args) throws IOException, SQLException, ParseException {
 		
 		Index.create(); 
-		Index.search("苹果");
+		List<Items> lists=Index.search("苹果");
+		for(Items list:lists){
+			System.out.println(list.getId());
+			System.out.println(list.getMarketName());
+			System.out.println(list.getMarketPrice());
+			System.out.println(list.getPrice());
+			System.out.println(list.getTitle());
+			System.out.println(list.getUrl());
+		}
+		
 //		Index.search("水       资生堂".split("[ |,|+|，]+"));
 //		PageArgs pag=new PageArgs().getPageArgs("jingdong");
 //		System.out.println(pag.getPageSize());
@@ -42,7 +54,7 @@ public class Demo {
 //			Entry<String, Connection> ite=iter.next(); 
 //			System.out.println(ite.getKey()+":"+ite.getValue()); 
 //		} 
-		
+//	 
 	 
 	} 
 }

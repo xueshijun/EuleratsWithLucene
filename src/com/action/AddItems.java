@@ -71,4 +71,5 @@ public class AddItems extends HttpServlet {
 			e.printStackTrace();
 		}
 	} 
+
 }

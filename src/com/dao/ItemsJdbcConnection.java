@@ -36,7 +36,7 @@ public class ItemsJdbcConnection {
 //    	String user = "root";
 ////    	String user = "xueshijun"; 
 //// 		Java连接MySQL配置时的密码 
-//    	String password = "xueshijun"; 
+//    	String password = "root3306"; 
 //		try
 //        { 
 //        	// 加载驱动程序 
@@ -51,17 +51,21 @@ public class ItemsJdbcConnection {
 //        }
 //		return null;  
 //	}
-//	
+	
 	public  static Connection getConnetction(String strDBName) {
 		Connection conn = null;	
 		try {
         	// 加载驱动程序 
         	Class.forName(ConfigUtil.getValue("driver")); 
+        	System.out.println(ConfigUtil.getValue("driver"));
         	// 连接数据库  
         	conn=DriverManager.getConnection(
-						ConfigUtil.getValue("url")+strDBName,
+						ConfigUtil.getValue("url")+strDBName+"?useUnicode=true&characterEncoding=utf8",
 						ConfigUtil.getValue("dbuser"),
 						ConfigUtil.getValue("dbpwd")); 
+        	System.out.println(ConfigUtil.getValue("url")+strDBName+"?useUnicode=true&characterEncoding=utf8");
+        	System.out.println(ConfigUtil.getValue("dbuser"));
+        	System.out.println(ConfigUtil.getValue("dbpwd"));
 			} catch (SQLException e) { 
 				System.out.println("SQL连接错误！"+e.toString());
 				e.printStackTrace();
@@ -71,6 +75,7 @@ public class ItemsJdbcConnection {
 			}   
 			return conn;
 	}
+	
 	
     /**
      * 执行SQL语句

@@ -9,10 +9,14 @@ import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
@@ -26,7 +30,6 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.Version;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
 import com.dao.ItemsJdbcConnection;
@@ -36,10 +39,10 @@ import com.utils.ConfigUtil;
 public class Index {
 	public Index(){}
 	
-	public final static String INDEX_STORE_PATH="J:/home/xueshijun/File/AllIndex"+File.separator; 
+	public final static String INDEX_STORE_PATH="C:/Index_File/AllIndex"+File.separator; 
 	
 	private static Document getDocument(String market,String id,String title)
-	throws SQLException{  
+		throws SQLException{   
 		Document doc=new Document(); 
 			doc.add(
 					new Field("ID",id,Field.Store.YES,Field.Index.NO));
@@ -66,55 +69,44 @@ public class Index {
 			
 		String sql="select * from ITMmain"; 
 		
-//		String[] str_Conn=ConfigUtil.getValue("DBNAMES").split(","); 
-//		
-//		Map<String,Connection>  listConnMap=new HashMap<String,Connection>();
-//		for(int i=0;i<str_Conn.length;i++){
-//			listConnMap.put(str_Conn[i],ItemsJdbcConnection.getConnetction(str_Conn[i]));
-//		}
+		String[] str_Conn=ConfigUtil.getValue("DBNAMES").split(",");  
+		Map<String,Connection>  connMap=new HashMap<String,Connection>();
+		for(int i=0;i<str_Conn.length;i++){
+			connMap.put(str_Conn[i],ItemsJdbcConnection.getConnetction(
+					ConfigUtil.getValue(str_Conn[i])));
+		}  
 		
-		Connection [] conn=new Connection[]{
-				ItemsJdbcConnection.getConnetction(ConfigUtil.getValue("YIHAODIAN")),
-				ItemsJdbcConnection.getConnetction(ConfigUtil.getValue("JINGDONG")),
-				ItemsJdbcConnection.getConnetction(ConfigUtil.getValue("AMAZON"))
-				}; 
+		Set<Entry<String, Connection>> entry=connMap.entrySet();
+		Iterator<Entry<String, Connection>> iterator=entry.iterator();
+		System.out.println("Get SQL MATCHING DB.....");
 		
-		try {
-			for(int i=0;i<conn.length;i++){	
-				String market = "";
-				switch(i){
-				case 0:
-					market=Items.YIHAODIAN_STRING; 
-					break;
-				case 1:
-					market=Items.JINGDONG_STRING;
-					break;
-				case 2:
-					market=Items.AMAZON_STRING;
-					break;
-				} 
-				
-				
-//				id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-//				ITMid VARCHAR(16) NOT NULL,
-//				ITMstore int(2) NOT NULL,
-//				ITMtitle VARCHAR(120) CHARACTER SET utf8 NOT NULL,
-//				ITMprice FLOAT(6,2) NOT NULL,
-//				ITMmprice FLOAT(6,2) NOT NULL,
-				
-				
-				ResultSet rs=ItemsJdbcConnection.getResultSet(conn[i], sql);  
-				while(rs.next()){ 
-					writer.addDocument(
-							getDocument(market, rs.getString("id"),market+" "+rs.getString("ITMtitle")));   
-					System.out.println(market+"  "+rs.getString("id")+"  "+rs.getString("ITMtitle"));
-				} 
-				rs.close();
-				conn[i].close(); 
-				System.out.println(market+"  has   finished!");
-			}
-		}catch(Exception ex){
+		
+		String market = "";
+		while(iterator.hasNext()){
+			Entry<String, Connection> entity=iterator.next(); 
 			
+			System.out.println(entity.getKey()+":"+entity.getValue());
+			if(entity.getKey().equals(Items.YIHAODIAN)){ 
+				market=Items.YIHAODIAN_STRING; 
+			}else if(entity.getKey().equals(Items.JINGDONG)){ 
+				market=Items.JINGDONG_STRING;
+			} else if(entity.getKey().equals(Items.AMAZON)){ 
+				market=Items.AMAZON_STRING;
+			}else if(entity.getKey().equals(Items.COO8)){ 
+				market=Items.COO8_STRING;
+			} 
+
+				
+			ResultSet rs=ItemsJdbcConnection.getResultSet(entity.getValue(), sql);  
+			while(rs.next()){ 
+				writer.addDocument(
+						getDocument(market, rs.getString("id"),market+" "+rs.getString("ITMtitle")));
+				
+				System.out.println(market+"  "+rs.getString("id")+"  "+rs.getString("ITMtitle"));
+			} 
+			rs.close();
+			entity.getValue().close(); 
+			System.out.println(market+"  has   finished!");
 		} 	 
 		long end=System.currentTimeMillis();
 		System.out.println("All has finished!");
@@ -122,7 +114,7 @@ public class Index {
 		writer.close();
 	}
 
-
+ 
 
 
 
@@ -172,8 +164,8 @@ public class Index {
 		Collections.sort(lists,new Comparator<Object>(){ 
 			public int compare(Object o1, Object o2) { 
 				return Collator.getInstance(Locale.CHINESE).compare(
-						((Items)o1).getMarket()
-						,((Items)o2).getMarket()); 
+						((Items)o1).getMarketName()
+						,((Items)o2).getMarketName()); 
 			} 
 		});
 //		for(Items list:lists){
@@ -237,8 +229,8 @@ public class Index {
 		Collections.sort(lists,new Comparator<Object>(){ 
 			public int compare(Object o1, Object o2) { 
 				return Collator.getInstance(Locale.CHINESE).compare(
-						((Items)o1).getMarket()
-						,((Items)o2).getMarket()); 
+						((Items)o1).getMarketName()
+						,((Items)o2).getMarketName()); 
 			} 
 		});
 //		for(Items list:lists){
